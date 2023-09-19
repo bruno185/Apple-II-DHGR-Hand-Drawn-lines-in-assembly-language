@@ -1,5 +1,5 @@
 * * * * * * * * * * * * * * * * * * * * * * * *
-*  "Hand drawn lines" with Graphics Primitives *           
+* "Hand drawn lines" with Graphics Primitives *           
 * * * * * * * * * * * * * * * * * * * * * * * *
 *
 *
