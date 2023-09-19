@@ -1,5 +1,5 @@
 * * * * * * * * * * * * * * * * * * * * * * * *
-*  "Hand drawn line" with Graphics Primitives *           
+*  "Hand drawn lines" with Graphics Primitives *           
 * * * * * * * * * * * * * * * * * * * * * * * *
 *
 *
@@ -21,7 +21,6 @@ Strobe          equ $C010                               ; Keyboard Strobe
 ptr             equ $06
 ptr2            equ $08
 
-                ;jsr bckupZP
 debut           jsr home                        ; clear screen
                 
                 jsr WaitForKeyPress
@@ -48,6 +47,7 @@ copy8
                 bne copy8 
 
                 jsr SetDeltaXY                  ; calcutate deltas
+                
 
                 DoCompare16 deltaMax;seglength;cmp16
                 beq DoshortLine
@@ -150,8 +150,6 @@ segcount        ds 1
 * move points randomly 
 mvpt01          lda savnbpt
                 sta nbpt
-
-                ;jsr initrandom
 
                 lda #<theopt                    ; set ptr to fisrt point
                 sta ptr 
@@ -348,30 +346,95 @@ endpoptable
 *
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 *
+* On keypressed, modify vars
+*
+maxvardef       equ 3
+seglengthdef    equ 8
+pensizeXdef     equ 2
+pensizeYdef     equ 1
+
+seglengthmax    equ 100
+seglengthmin    equ 3
+maxvarmax       equ 50
+maxvarmin       equ 3
+
+pensizeXmax     equ 12
+pensizeXmin     equ 1
+pensizeYmax     equ 12
+pensizeYmin     equ 1
+
 AdjutVars
-                cmp #'S'
+                cmp #'O'                        ; O : reset original values
+                bne notO
+                lda #maxvardef
+                sta maxvar
+                lda #seglengthdef
+                sta seglength
+                lda #pensizeXdef
+                sta pensize2
+                lda #pensizeYdef
+                sta pensize2+1  
+                rts         
+
+notO            cmp #'X'                        ; X : pensize.x bigger
+                bne notX
+                lda pensize2
+                cmp #pensizeXmax
+                bcs psxmax
+                inc pensize2
+psxmax          rts
+
+notX            cmp #'W'                        ; W : pensize.x smaller
+                bne notW
+                lda pensize2
+                cmp #pensizeXmin
+                beq psxmin
+                dec pensize2
+psxmin          rts
+
+notW            cmp #'Y'                        ; Y : pensize.y bigger
+                bne notY
+                lda pensize2+1
+                cmp #pensizeYmax
+                bcs psymax
+                inc pensize2+1
+psymax          rts
+
+notY            cmp #'U'                        ; U : pensize.y smaller
+                bne notU
+                lda pensize2+1
+                cmp #pensizeYmin
+                beq psymin
+                dec pensize2+1
+psymin          rts
+
+notU            cmp #'S'                        ; S : segments smaller
                 bne notS
                 lda seglength
-                cmp #100
+                cmp #seglengthmax
                 bcs notL
                 inc seglength
                 rts
-notS            cmp #'D'
+
+notS            cmp #'D'                        ; D : segments longer                        
                 bne notD
                 lda seglength
-                cmp #4 
+                cmp #seglengthmin 
                 bcc notL
                 dec seglength
-notD            cmp #'M'
+
+notD            cmp #'M'                        ; M : bigger variations
                 bne notM
                 lda maxvar
-                cmp #50
+                cmp #maxvarmax
                 bcs notL
                 inc maxvar
-notM            cmp #'L'
+                rts
+                
+notM            cmp #'L'                        ; L : smaller variations
                 bne notL
                 lda maxvar
-                cmp #3
+                cmp #maxvarmin
                 bcc notL
                 dec maxvar
 notL            rts

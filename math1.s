@@ -20,7 +20,7 @@ SetDeltaXY
                 lda Point2+1                    
                 sbc Point1+1                    ; high byte of Point2.x - Point1.x in A
                 sta deltaX+1
-                printm deltaX                   ; debug
+                ;printm deltaX                   ; debug
 * set signX 
                 lda #0
                 sta signX
@@ -37,7 +37,7 @@ SetDeltaXY
                 lda Point2+3
                 sbc Point1+3                    ; high byte of Point2.x - Point1.x in Y
                 sta deltaY+1
-                printm deltaY                   ; debug
+                ;printm deltaY                   ; debug
 * set signY
                 lda #0
                 sta signY
@@ -46,7 +46,7 @@ SetDeltaXY
                 beq :2
                 inc signY
 :2              
-                printm signX                    ; debug (print signX and signY)
+                ;printm signX                    ; debug (print signX and signY)
 
 * set |deltaX| in deltaXabs var
                 lda deltaX                      ; init deltaXabs 
@@ -72,7 +72,7 @@ SetDeltaXY
                 sta deltaXabs+1          
 dxpos
                 cr
-                printm deltaXabs                 ; debug 
+                ;printm deltaXabs                 ; debug 
                 
 * set |deltaX| in deltaYabs var
                 lda deltaY                      ; init deltaYabs 
@@ -97,7 +97,7 @@ dxpos
                 adc #0
                 sta deltaYabs+1
 dypos
-                printm deltaYabs                 ; debug 
+                ;printm deltaYabs                 ; debug 
 
 * Set max(daltaXabs,deltaYabs)
 
@@ -106,9 +106,9 @@ dypos
                 bcs isbigger
 
 issmaller       
-                jsr print                       ; debug
-                dfb :1-*-1
-                asc "SMALLER"
+                ;jsr print                       ; debug
+                ;dfb :1-*-1
+                ;asc "SMALLER"
 :1              lda deltaYabs
                 sta deltaMax
                 lda deltaYabs+1
@@ -120,9 +120,9 @@ issmaller
                 jmp prnMax
 
 isegal       
-                jsr print                       ; debug
-                dfb :2-*-1
-                asc "EGAL"
+                ;jsr print                       ; debug
+                ;dfb :2-*-1
+                ;asc "EGAL"
 :2              lda deltaYabs                   ; or deltaXabs (=)
                 sta deltaMax
                 lda deltaYabs+1
@@ -134,9 +134,9 @@ isegal
                 jmp prnMax
 
 isbigger      
-                jsr print                       ; debug 
-                dfb :3-*-1
-                asc "BIGGER"
+                ;jsr print                       ; debug 
+                ;dfb :3-*-1
+                ;asc "BIGGER"
 :3              lda deltaXabs
                 sta deltaMax
                 lda deltaXabs+1
@@ -147,7 +147,7 @@ isbigger
 
 prnMax 
                 cr
-                printm deltaMax                 ; debug
+                ;printm deltaMax                 ; debug
                 rts
 
 

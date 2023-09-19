@@ -30,21 +30,21 @@ DoX
                 movInt dividend;Xinc                    ; integer part
                 movInt decimal;XincDec                  ; decimal part
 
-                cr
-                printm deltaXabs                        ; = dividend
-                printm nbpt                             ; = divisor
-                printm dividend                         ; result of division (integer part)
-                printm XincDec                          ; result of division (decimal part)    
+                ;cr
+                ;printm deltaXabs                        ; = dividend
+                ;printm nbpt                             ; = divisor
+                ;printm dividend                         ; result of division (integer part)
+                ;printm XincDec                          ; result of division (decimal part)    
                      
 DoY
                 DoDivid16 deltaYabs;nbpt;div16dec
                 movInt dividend;Yinc                    ; integer part  
                 movInt decimal;YincDec                  ; decimal part
-                cr
-                printm deltaYabs                        ; = dividend
-                printm nbpt                             ; = divisor
-                printm dividend                         ; result of division (integer part)
-                printm YincDec                          ; result of division (decimal part)               
+                ;cr
+                ;printm deltaYabs                        ; = dividend
+                ;printm nbpt                             ; = divisor
+                ;printm dividend                         ; result of division (integer part)
+                ;printm YincDec                          ; result of division (decimal part)               
 
 endinc          rts
                 
