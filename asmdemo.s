@@ -21,8 +21,9 @@ Strobe          equ $C010                               ; Keyboard Strobe
 ptr             equ $06
 ptr2            equ $08
 
-debut           jsr home                        ; clear screen
-                
+                jsr home                        ; clear screen
+
+debut    
                 jsr WaitForKeyPress
                 jsr AdjutVars
                 jsr Graf
@@ -66,7 +67,7 @@ longline
                 jsr SetInc                      ; set increment in X and Y direction between points to dispalce
                 jsr PopTab                      ; fill a table of points
 
-dg              jsr DoLine                      ; drew 
+dg              jsr DoLine                      ; draw a line (split in segments and draw each segment)
 
 
                 lda ptr2                        ; set ptr2 point2 to next couple of points
@@ -118,7 +119,7 @@ domove
 
                 dec segcount                            ; update counter
                 lda segcount
-                bpl domove                              ; if not 0 then loop
+                bne domove                              ; if not 0 then loop
 
                 lda #<theopt                            ; reset modified code
                 sta domove+4
@@ -630,7 +631,7 @@ ymov            ds 1
 xneg            ds 1
 yneg            ds 1
 maxvar          dfb 4                           ; Attention !! if changed, "and #3" instructions should also be modified
-seglength       dw 8
+seglength       dw 4
 
 dataptr         ds 2
 
