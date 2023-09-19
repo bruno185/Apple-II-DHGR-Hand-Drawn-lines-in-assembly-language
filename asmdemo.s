@@ -22,7 +22,7 @@ ptr             equ $06
 ptr2            equ $08
 
                 jsr home                        ; clear screen
-                jsr welcome
+                jsr welcome                     ; show welcome and istructions 
 
 debut    
                 jsr WaitForKeyPress
@@ -91,7 +91,9 @@ dg              jsr DoLine                      ; draw a line (split in segments
                 jmp debut
                 rts
 
-* * * * * * * * * * * * GRAF * * * * * * * * * * * *
+* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+* Draw a line
+*
 DoLine          
                 lda shortLineflag            
                 beq dolong                      ; if shortLineflag = 0 : process long line 
@@ -132,7 +134,8 @@ endloop         lda #<theopt                            ; reset modified code
                 sta domove+5 
 
 outdraw         rts
-************ loop back here
+* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
 
 dowait          jsr WaitForKeyPress
                 cmp #$1B                                ; test escape key
@@ -614,9 +617,12 @@ welcome
                 cr
                 print instuction4
                 cr 
-                cr
+                print instuction6
                 cr
                 print instuction5
+                cr
+                cr
+                print instuction10
 
                 rts
 
@@ -631,7 +637,11 @@ instuction3     asc "- X/W to inc/dec pen width."
                 hex 00 
 instuction4     asc "- Y/U to inc/dec pen height."
                 hex 00 
-instuction5     asc "Hit a key to start drawing..."
+instuction5     asc "- Any other key to redraw with same parameters"
+                hex 00 
+instuction6     asc "- O to reset default parameter"
+                hex 00 
+instuction10     asc "Hit a key to start drawing..."
                 hex 00                
                          
 
