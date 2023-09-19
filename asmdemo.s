@@ -10,7 +10,7 @@ GP_call     MAC                                         ; call to graphic primit
                 da  ]2                                  ; address of parameter(s) (2 bytes), 0 if no paramter
                 EOM
 
-                org $800
+                org $6000
                 put equates                             ; Graphics Primitives equates
                 put equ                                 ; general Apple II equates
 
@@ -22,10 +22,11 @@ ptr             equ $06
 ptr2            equ $08
 
                 jsr home                        ; clear screen
+                jsr welcome
 
 debut    
                 jsr WaitForKeyPress
-                jsr AdjutVars
+                jsr AdjustVars
                 jsr Graf
 
                 jsr initrandom
@@ -98,16 +99,14 @@ DoLine
                 GP_call MoveTo;Point1           ; else draw a straight line
                 GP_call LineTo;Point2           ; from Point1 to Point2 
                 rts
+
 dolong       
-                jsr mvpt01
+                jsr mvpt01                      ; displace points
 
-doline2         lda savnbpt
-                sta segcount
-
+doline2         
+                movInt savnbpt;segcount
                 GP_call MoveTo;theopt
-
-domove          
-                GP_call LineTo;theopt
+domove          GP_call LineTo;theopt
 
                 lda domove+4                            ; modify code above
                 clc
@@ -117,11 +116,17 @@ domove
                 adc #0
                 sta domove+5
 
-                dec segcount                            ; update counter
-                lda segcount
-                bne domove                              ; if not 0 then loop
+                ;dec segcount                            ; update counter
 
-                lda #<theopt                            ; reset modified code
+                lda segcount
+                bne lab2
+                lda segcount+1
+                beq endloop
+                dec segcount+1
+lab2            dec segcount          
+                jmp domove                              ; if not 0 then loop
+
+endloop         lda #<theopt                            ; reset modified code
                 sta domove+4
                 lda #>theopt
                 sta domove+5 
@@ -144,13 +149,13 @@ noquit
 
                 jmp DoLine                              ; loop
                 rts
-segcount        ds 1
+segcount        ds 2
 
 
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 * move points randomly 
-mvpt01          lda savnbpt
-                sta nbpt
+mvpt01          
+                movInt savnbpt;nbpt
 
                 lda #<theopt                    ; set ptr to fisrt point
                 sta ptr 
@@ -256,11 +261,18 @@ donegy          ldy #2
                 sta ptr
                 lda ptr+1
                 adc #0
-                sta ptr+1               
-                dec nbpt
-                beq :1 
+                sta ptr+1 
+
+                ;dec nbpt
+                lda nbpt
+                bne lab
+                lda nbpt+1
+                beq exit
+                dec nbpt+1
+lab             dec nbpt
+
                 jmp mvpt
-:1              rts
+exit            rts
 
 Quitprog
                 ;jsr rstZP
@@ -338,8 +350,15 @@ oknow
                 adc #0
                 sta ptr+1
 
-                dec nbpt
-                beq endpoptable
+                ;dec nbpt
+
+                lda nbpt
+                bne label
+                lda nbpt+1
+                beq endpoptable 
+                dec nbpt+1
+label           dec nbpt
+
                 jmp loopPokeTab 
 endpoptable
                 rts
@@ -364,7 +383,7 @@ pensizeXmin     equ 1
 pensizeYmax     equ 12
 pensizeYmin     equ 1
 
-AdjutVars
+AdjustVars
                 cmp #'O'                        ; O : reset original values
                 bne notO
                 lda #maxvardef
@@ -577,6 +596,45 @@ Wait
                 lda KeyBoard                            ; get key value
                 rts
 rseed           dw 46990
+
+*
+* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+* welcome screen
+
+welcome
+                cr
+                print welc
+                cr
+                cr
+                print instuction1
+                cr
+                print instuction2
+                cr
+                print instuction3
+                cr
+                print instuction4
+                cr 
+                cr
+                cr
+                print instuction5
+
+                rts
+
+
+welc            asc "     Welcome to hand drawing program !"
+                hex 00
+instuction1     asc "- S/D to inc/dec segment # per line."
+                hex 00
+instuction2     asc "- M/L to inc/dec diplacement of points."
+                hex 00 
+instuction3     asc "- X/W to inc/dec pen width."
+                hex 00 
+instuction4     asc "- Y/U to inc/dec pen height."
+                hex 00 
+instuction5     asc "Hit a key to start drawing..."
+                hex 00                
+                         
+
 *
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 * Librairies
@@ -603,10 +661,7 @@ Xinc            ds 2
 YincDec         ds 2                            ; decimal part of Xinc
 Yinc            ds 2
 
-theopt          ds 511
-theoptend       ds 1
-theoptsav       ds 511
-theoptsavend    ds 1
+theopt          ds 2048
 
 nbpt            ds 2
 savnbpt         ds 2
@@ -619,7 +674,7 @@ Point1          dw 25,10                        ; upper left corner
 Point2          dw 501,190                      ; bottom right corner
 *****
 pnt1            dw 1,1
-pnt2          dw 1,191
+pnt2            dw 1,191
 
 
 fsignX          ds 1
@@ -630,8 +685,11 @@ xmov            ds 1
 ymov            ds 1
 xneg            ds 1
 yneg            ds 1
-maxvar          dfb 4                           ; Attention !! if changed, "and #3" instructions should also be modified
-seglength       dw 4
+
+*****
+maxvar          dfb 3                           ; Attention !! if changed, "and #3" instructions should also be modified
+seglength       dw 8
+*****
 
 dataptr         ds 2
 

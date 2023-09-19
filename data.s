@@ -2,11 +2,9 @@ linedata
 
 * frame
         dw 1,1,556,1
-        dfb $FF,$FF
         dw 556,2,555,190
         dw 555,190,3,190
         dw 3,190,3,1
-        ;dfb $FF,$FF
 
 * top pattern
     dw 25,91,27,52

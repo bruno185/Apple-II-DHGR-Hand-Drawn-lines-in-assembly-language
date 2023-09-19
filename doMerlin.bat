@@ -30,8 +30,8 @@ echo --------------- Debut Applecommander ---------------
 rem add binary program to image disk
 rem 16384 = $4000. Change it to your own ORG address.
 rem %ACJAR% -d %PRG%
-rem %ACJAR% -p %PRG%.po %PRG% bin 24576 < %PRG%
-%ACJAR% -p %PRG%.po %PRG% bin 2048 < %PRG%
+%ACJAR% -p %PRG%.po %PRG% bin 24576 < %PRG%
+rem %ACJAR% -p %PRG%.po %PRG% bin 2048 < %PRG%
 echo --------------- fin Applecommander ---------------
 
 echo --------------- Debut Applewin ---------------
