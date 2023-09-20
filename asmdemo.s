@@ -22,7 +22,7 @@ ptr             equ $06
 ptr2            equ $08
 
                 jsr home                        ; clear screen
-                jsr welcome                     ; show welcome and istructions 
+                jsr welcome                     ; show welcome screen and instructions 
 
 debut    
                 jsr WaitForKeyPress
@@ -40,19 +40,24 @@ bigloop
                 ldy #0
                 ldx #0
 
-copy8
-                lda (ptr2),y                    ; copy 2 points to Point 1 ad Point2 vars
+copy8           lda (ptr2),y                    ; copy 2 points to Point 1 ad Point2 vars
                 sta Point1,x 
                 iny
                 inx 
                 cpx #8
                 bne copy8 
 
-                jsr SetDeltaXY                  ; calcutate deltas
-                
+                lda Novariation                 ; test no variation flag
+                beq VariationOn                 ; flag = 0 : process variations
+                jsr straightline                ; flag = 1 : draw straight line
+                jmp nextline
 
+
+VariationOn
+                jsr SetDeltaXY                  ; calcutate deltas
+        
                 DoCompare16 deltaMax;seglength;cmp16
-                beq DoshortLine
+                beq DoshortLine                 ; if deltaMaw <= seglength then goto DoshortLine
                 bcc DoshortLine
                                  
                 lda #0                          ; here if deltaMax > seglength           
@@ -62,16 +67,14 @@ copy8
 DoshortLine     lda #1                          ; here if line is too short for variations
                 sta shortLineflag
                 jmp dg 
-
-longline
-                jsr SetNpPt                     ; determine number of points to be displaced
+      
+longline        jsr SetNpPt                     ; determine number of points to be displaced
                 jsr SetInc                      ; set increment in X and Y direction between points to dispalce
                 jsr PopTab                      ; fill a table of points
 
 dg              jsr DoLine                      ; draw a line (split in segments and draw each segment)
 
-
-                lda ptr2                        ; set ptr2 point2 to next couple of points
+nextline        lda ptr2                        ; set ptr2 pointer to next couple of points
                 clc
                 adc #8
                 sta ptr2
@@ -98,7 +101,7 @@ DoLine
                 lda shortLineflag            
                 beq dolong                      ; if shortLineflag = 0 : process long line 
                                                 ; (longer than seglength)
-                GP_call MoveTo;Point1           ; else draw a straight line
+straightline    GP_call MoveTo;Point1           ; else draw a straight line
                 GP_call LineTo;Point2           ; from Point1 to Point2 
                 rts
 
@@ -387,6 +390,14 @@ pensizeYmax     equ 12
 pensizeYmin     equ 1
 
 AdjustVars
+
+                cmp #'N'                        ; N : no variation toggle (straight lines)
+                bne notN 
+                lda Novariation
+                eor #1
+                sta Novariation
+                rts
+notN 
                 cmp #'O'                        ; O : reset original values
                 bne notO
                 lda #maxvardef
@@ -396,7 +407,9 @@ AdjustVars
                 lda #pensizeXdef
                 sta pensize2
                 lda #pensizeYdef
-                sta pensize2+1  
+                sta pensize2+1 
+                lda #0
+                sta Novariation 
                 rts         
 
 notO            cmp #'X'                        ; X : pensize.x bigger
@@ -644,64 +657,58 @@ instuction6     asc "- O to reset default parameter"
 instuction10     asc "Hit a key to start drawing..."
                 hex 00                
                          
-
 *
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 * Librairies
                 put math1                       ; calculting for this program
                 put math2                       ; division using fixed point functions
                 put fpdlib                      ; my fixed point library
-                put data
-
+                put data                        ; lines coordinaites : 8 bytes per line :
+                                                ; starting point.x (2 bytes), starting point.y (2 bytes),
+                                                ; ending point.x (2 bytes), ending point.y (2 bytes),
 *
 * * * * * * * * * * * * DATA * * * * * * * * * * * *
-deltaX          ds 2
-deltaY          ds 2
-deltaXabs       ds 2
-deltaYabs       ds 2
-deltaMax        ds 2
-curptX          ds 4
-curptY          ds 4
+deltaX          ds 2                            ; Point2.x minus Point1.x
+deltaY          ds 2                            ; Point2.y minus Point1.y
+deltaXabs       ds 2                            ; absolute value of deltaX 
+deltaYabs       ds 2                            ; absolute value of deltaY
+deltaMax        ds 2                            ; Max(deltaXabs,deltaYabs)
+curptX          ds 4                            ; current x coordinate in line drawing loop
+curptY          ds 4                            ; current y coordinate in line drawing loop 
 
-signX           ds 1
-signY           ds 1
+signX           ds 1                            ; sign of x incerment 
+signY           ds 1                            ; sign of y incerment 
 
 XincDec         ds 2                            ; decimal part of Xinc
-Xinc            ds 2
+Xinc            ds 2                            ; incement in x direction for each line segment
 YincDec         ds 2                            ; decimal part of Xinc
-Yinc            ds 2
+Yinc            ds 2                            ; incement in y direction for each line segment
 
-theopt          ds 2048
+theopt          ds 2048                         ; strorage for displaced points 
 
-nbpt            ds 2
-savnbpt         ds 2
+nbpt            ds 2                            ; number of points in a line (points split lines in segments)
+savnbpt         ds 2                            ; save nbpt
 
-shortLineflag   ds 1
-VertFlag        ds 1
+shortLineflag   ds 1                            ; flag = 1 if : line is too short, it is not segmented
+VertFlag        ds 1                            ; flap = 1 if :line is more vertical than horizontal
 
 *****
 Point1          dw 25,10                        ; upper left corner
 Point2          dw 501,190                      ; bottom right corner
 *****
-pnt1            dw 1,1
-pnt2            dw 1,191
 
+xmov            ds 1                            ; value of x displacement 
+ymov            ds 1                            ; value of y displacement 
+xneg            ds 1                            ; sign of x displacement 
+yneg            ds 1                            ; sign of y displacement 
 
-fsignX          ds 1
-fsignY          ds 1
-
-vert_line       dw 10,-10
-xmov            ds 1
-ymov            ds 1
-xneg            ds 1
-yneg            ds 1
-
-*****
-maxvar          dfb 3                           ; Attention !! if changed, "and #3" instructions should also be modified
-seglength       dw 8
-*****
-
-dataptr         ds 2
+* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+***** these parameters can be modified at run time (by appropriate keys)
+maxvar          dfb 3                           ; max value of displacements
+seglength       dw 8                            ; divisor of a line
+pensize2        dfb 2,1                         ; enlarge your pen
+Novariation     dfb 0                           ; flag = 1 : draw line without any variation (staight lines) 
+* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 QuitParams      dfb 4                           ; parameters for ProDOS quit mli call
                 dw 0,0,0,0  
@@ -722,5 +729,5 @@ DoNotSave       dfb 0
 SaveZP          dfb $80
 
 pensize1        dfb 1,1                         ; standard pensize
-pensize2        dfb 2,1                         ; enlarge your pen
+
 
