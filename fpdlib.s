@@ -76,7 +76,6 @@ ovflow
 retadrcmp       ds 2
 op1             ds 2
 op2             ds 2
-
 *
 * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 * division 16 bits V2
