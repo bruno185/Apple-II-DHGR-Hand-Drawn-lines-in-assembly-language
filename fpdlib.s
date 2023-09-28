@@ -183,8 +183,8 @@ l22             dex
                 sta decimal
                 sta decimal+1
 
-                lda rem                         ; test remaider 
-                ora rem+1                       ; if remaider = 0 : exit
+                lda rem                         ; test remainder 
+                ora rem+1                       ; if remainder = 0 : exit
                 beq endec
 
                 movInt dividend;tempo           ; save result (integer part)
@@ -196,9 +196,9 @@ endec           rts
 *
 Decimal                                                ; calcute decimal part
 * ALGO :
-* remainder = remaider * 2 ; 
-* if remaider < divisor then shift left decimal var with carry clear and loop (unless already 16 loops)
-* if remaider >= divisor then shift left decimal var with carry set,
+* remainder = remainder * 2 ; 
+* if remainder < divisor then shift left decimal var with carry clear and loop (unless already 16 loops)
+* if remainder >= divisor then shift left decimal var with carry set,
 * divide remainder by divisor and loop (unless already 16 loops)
 *
                 lda #16                                 ; init loop counter
