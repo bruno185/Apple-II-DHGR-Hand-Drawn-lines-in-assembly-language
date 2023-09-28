@@ -209,7 +209,7 @@ restart         asl rem                                 ; remainder x 2
                 beq equal 
                 bcs bigger                              ; branch if equal or bigger
                 clc
-                rol decimal                             ; else shift left decimal with 0 in carry
+                rol decimal                             ; else shift left decimal with carry clear
                 rol decimal+1
                 dec loopcnt                             ; loop if not 16 loops
                 beq endfunc
