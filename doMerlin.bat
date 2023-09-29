@@ -13,7 +13,8 @@ Set MERLIN32LIBS=%MERLIN32ROOT%\Library
 Set MERLIN32WIN=%MERLIN32ROOT%\Windows
 Set MERLIN32EXE=%MERLIN32WIN%\merlin32.exe
 rem Set MERLIN32EXE=%MERLIN32WIN%\merlin32 1.1.10.exe
-Set APPLECOMMANDER=%MyAppleFolder%\Utilitaires\AppleCommander-win64-1.6.0.jar
+rem Set APPLECOMMANDER=%MyAppleFolder%\Utilitaires\AppleCommander-win64-1.6.0.jar
+Set APPLECOMMANDER=%MyAppleFolder%\Utilitaires\AppleCommander-ac-1.8.0.jar
 rem Set ACJAR=java.exe -jar %APPLECOMMANDER%    ; avec ""
 Set ACJAR=java.exe -jar %APPLECOMMANDER%
 rem echo %ACJAR%
